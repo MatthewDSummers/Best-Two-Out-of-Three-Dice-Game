@@ -26,7 +26,7 @@ def best_two_out_of_three():
             data["play_game"] = True
             break
         elif initialize.lower() == "b":
-            give_score(data, tie_breaker=False, resume=False)
+            give_score(data, resume=False)
             break
 
     while data["play_game"] is True:
@@ -58,7 +58,7 @@ def best_two_out_of_three():
 
         # Quit game
         elif choice.lower() == "b":
-            give_score(data, tie_breaker=False, resume=False)
+            give_score(data, resume=False)
 
 # Display outcome of roll
 def end_round(outcome, data):
@@ -81,21 +81,18 @@ def tally_points(data):
     if data["user_round_score"] in scores_to_win and data["opponent_round_score"] < 2:
         finished = True
         option_to_restart = input(f"{GREEN} You won Best Two Out of Three! Play again?\n Y / N\n {RESET}")
-        tie_breaker = False
+        
         data["user_game_score"] += 1
 
     # Computer wins
     elif data["opponent_round_score"] in scores_to_win and data["user_round_score"] < 2:
         finished = True
         option_to_restart = input(f"{RED} You lost Best Two Out of Three. Try again?\n Y / N\n {RESET}")
-        tie_breaker = False
+        
         data["opponent_game_score"] += 1
 
     # Tie breaker
     elif data["user_round_score"] > 1 and data["opponent_round_score"] > 1 and data["user_round_score"] == data["opponent_round_score"]:
-        finished = True
-        option_to_restart = "y"
-        tie_breaker = True
         print(f"{YELLOW} Tie game! Reroll! {RESET}")
 
     # Tie breaker result
@@ -103,14 +100,12 @@ def tally_points(data):
     elif data["user_round_score"] > data["opponent_round_score"] and data["user_round_score"] != 1:
         finished = True
         option_to_restart = input(f"{GREEN} You won Best Two Out of Three! Play again?\n Y / N\n {RESET}")
-        tie_breaker = False
         data["user_game_score"] += 1
 
     # computer wins 
     elif data["user_round_score"] < data["opponent_round_score"] and data["opponent_round_score"] != 1:
         finished = True
         option_to_restart = input(f"{RED} You lost Best Two Out of Three. Try again?\n Y / N\n {RESET}")
-        tie_breaker = False
         data["opponent_game_score"] += 1
 
     if option_to_restart is not None:
@@ -118,17 +113,17 @@ def tally_points(data):
             option_to_restart = input("Please enter 'Y' or 'N': ")
 
     if finished == True:
-        return end_game_or_new_game(option_to_restart, tie_breaker, data)
+        return end_game_or_new_game(option_to_restart, data)
 
 # Start new game or finish
-def end_game_or_new_game(option_to_restart, tie_breaker, data):
+def end_game_or_new_game(option_to_restart, data):
     if option_to_restart.lower() == "n":
-        return give_score(data, tie_breaker, resume=False)
+        return give_score(data, resume=False)
     elif option_to_restart.lower() == "y":
-        return give_score(data, tie_breaker, resume=True)
+        return give_score(data, resume=True)
 
 # Tell game score, if applicable
-def give_score(data, tie_breaker=False, resume=False):
+def give_score(data, resume=False):
     if not resume:
         if data["user_game_score"] or data["opponent_game_score"] != 0:
             print(f"Good game! Your score was {data['user_game_score']}, and the computer's score was {data['opponent_game_score']}")
@@ -136,7 +131,7 @@ def give_score(data, tie_breaker=False, resume=False):
             print("No problem! I'm here when you want to play.")
         data["play_game"] = False
 
-    elif not tie_breaker:
+    else:
         data["user_round_score"] = 0
         data["opponent_round_score"] = 0
         print(f"The score is {data['user_game_score']} (you) to {data['opponent_game_score']} (computer)")
